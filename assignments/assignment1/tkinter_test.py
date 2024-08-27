@@ -22,4 +22,3 @@ canvas.itemconfig(textwidget2, text="Press q to exit")
 
 while done == False:
     rootwindow.update()
-

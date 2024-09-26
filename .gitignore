@@ -167,6 +167,7 @@ cython_debug/
 *.fls
 *.log
 *.synctex.gz
+*.out
 
 # Other
 .DS_Store

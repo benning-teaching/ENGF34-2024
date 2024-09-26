@@ -25,6 +25,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+ENGF34-2024
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -169,6 +170,13 @@ cython_debug/
 *.log
 *.synctex.gz
 *.out
+*.nav
+*.snm
+*.toc
+*.vrb
+*.sty
+uclheader.pdf
+_minted-03_Basics_Slides
 
 # Other
 .DS_Store

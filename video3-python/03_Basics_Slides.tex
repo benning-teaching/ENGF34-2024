@@ -1,4 +1,4 @@
-\documentclass{beamer} % [aspectratio=169]
+\documentclass{beamer} %[aspectratio=169]
 \usetheme{ucl}
 \setbeamercolor{banner}{bg=darkred}
 \setbeamersize{description width=2em}
@@ -15,6 +15,10 @@
 \usepackage{natbib}
 \usepackage{bibentry}
 \usepackage{url}
+
+% Define the colors 'midred' and 'stone'
+\definecolor{midred}{rgb}{0.8, 0.0, 0.0}
+\definecolor{stone}{rgb}{0.8, 0.8, 0.8}
 
 \newenvironment{variableblock}[3]{%
   \setbeamercolor{block body}{#2}
@@ -34,11 +38,11 @@
   \end{frame}
 }
 
-\author{Prof.\ Mark Handley \\ University College London, UK}
+\author{Prof.\ Martin Benning\\ Prof.\ Mark Handley \\ University College London, UK}
 \title{Basics of Python}
-\subtitle{ENGF00034: Design and Professional Skills }
+\subtitle{ENGF0034: Design and Professional Skills }
 % \institute{}
-\date{Term 1, 2023}
+\date{Term 1, 2024}
 
 \begin{document}
 \nobibliography*
@@ -132,12 +136,12 @@ Thus by repeatedly applying the steps of the algorithm we keep the gcd in each s
 
 	\inputminted[
 		xleftmargin=1.4em,
-		%frame=lines,
-		%framesep=2mm,
-		%baselinestretch=1.2,
-		bgcolor=stone,
+		frame=lines,
+		framesep=2mm,
 		fontsize=\footnotesize,
-		linenos
+		breaklines=true,
+		breakanywhere=true,
+		bgcolor=stone
 	]{python}{src/interactive_euclid.py}
 
 \end{frame}
@@ -259,12 +263,12 @@ Refactoring the euclid algorithm to take advantage of \texttt{while} and \texttt
 
 	\inputminted[
 		xleftmargin=1.4em,
-		%frame=lines,
-		%framesep=2mm,
-		%baselinestretch=1.2,
-		bgcolor=stone,
+		frame=lines,
+		framesep=2mm,
 		fontsize=\footnotesize,
-		%linenos
+		breaklines=true,
+		breakanywhere=true,
+		bgcolor=stone
 	]{python}{src/subtraction_euclid.py}
 
 \end{frame}
@@ -534,10 +538,10 @@ Refactor Euclid to ensure that inputs are positive integers.
 		xleftmargin=1.4em,
 		frame=lines,
 		framesep=2mm,
-		% baselinestretch=1.2,
-		% bgcolor=stone,
 		fontsize=\footnotesize,
-		linenos
+		linenos,
+		breaklines=true,
+		breakanywhere=true
 	]{python}{src/subtraction_function_euclid_exc.py}
 
 The \emc{raise} keyword \emc{interrupts the flow of the program}, and exits the block with an exception immediately.

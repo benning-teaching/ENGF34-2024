@@ -162,6 +162,7 @@ cython_debug/
 #.idea/
 
 # LaTeX
+*.tex
 *.aux
 *.fdb_latexmk
 *.fls

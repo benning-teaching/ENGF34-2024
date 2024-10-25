@@ -12,7 +12,7 @@ class HashTable:
             self.insert(key, value)
 
     def get_index(self, key):
-        print(key, hash(key)%16)
+        # print(key, hash(key)%16)
         return hash(key) % self.bucket_count
 
     def insert(self, key, value):

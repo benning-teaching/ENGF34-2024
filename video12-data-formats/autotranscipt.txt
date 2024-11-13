@@ -1,0 +1,665 @@
+welcome back everyone in previous video we looked at how you actually store data on on computer hard
+drives and things like that and in this video i'm going to continue on that theme and we're going to look a bit more
+at file formats i'm going to look at how numbers are actually represented in computers and how you might store those
+we're going to look at a bit about strings and so generally speaking we're going to look at how you might represent and store data and
+that makes a big difference when you're trying to do things like saving the data from your game to disk or when you're trying to communicate
+information across a network you have to say how are we going to represent that data while it's in transit
+so quite a lot to talk about so let's get started
+okay so let's start by looking at text files now text files are not all that exciting but
+i've experienced that there's a lot of confusion so what actually is a text file so let's look at a text
+file that you're likely to have seen before here's a microsoft word file and
+all it has in this file is the text hello world so so i saved that as a doc file how
+large is that doc file hello world.doc well um
+22 kilobytes to save hello world so there must be something
+in there that is not just the text of hello world and the question is what is it so
+well if we can open it up in our favorite text editor um ah well it's a binary file and
+emacs doesn't do a terribly good job at editing binary files because it's a text editor
+so what else could we do um there's a simple utility called strings
+and what this does is it searches through binary files trying to find anything that looks like an ascii or
+similar string and print it out so let's run that over our word file
+and you can see that there's lots of stuff in here to do with versionings bits of stuff to do with
+themes and so forth if i scroll back up finally up there is my text hello world and there's some other
+stuff here too some secret text from an old edit hmm
+actually it turns out that microsoft word can do all sorts of fancy things including track changes and if i
+highlight the changes in the file there can be hidden text in
+there like the text i deleted from the previous edit so there's lots of things that can actually make itself into a a word file
+now as an aside you should probably never send people word files if you actually might have
+anything sensitive in them i once received a a cv from someone that when i
+when track changes was on revealed itself to actually have a whole bunch of comments from people who had actually
+reviewed previous versions of the cv so you probably don't want that um so a microsoft word file is definitely
+not just a text file there's a lot of other capabilities that are occurring there including lots of stuff to do with presentation
+fonts and things like that now it's actually a strange format
+really it includes an awful lot of basically a memory dump of internal data structures
+within within microsoft word and so it's not really a very good format for for microsoft being able to continue
+to develop the the um and going forward so at some point microsoft decided to
+actually move to a much more modern file format and so you also instead of not just having doc you have
+the docx file format so if we save the whole thing as a docx
+file instead then that's actually about half the size
+and so what's a docx file look like in our text editor um
+that's probably what not what you expected it to do when i went to open the file it's
+actually presenting it as a directory of lots of other files and the reason for this is that actually
+a microsoft word docx file is a zip file of a whole bunch of other
+files and emacs being quite a capable editor knows a zip file when it sees it and
+decides to try and open it and present me what's inside it and so we can actually look through here and we can see the different uh
+pieces of content for the document settings and things like that and if i open this particular one the document itself
+what we have in here is an xml file which looks very similar to html it's all these things within angle
+brackets and way down in the bottom here is hello
+world um in amongst all the formatting stuff it seems to require an awful lot of
+formatting stuff to not actually do any formatting um and also the the deleted text is still in there as
+well and so there's this is it actually at least it's now a documented text file format for how to
+do word processing whereas the actual doc file is not at all but both of these are way
+more complicated than we really want to think of when we're actually just thinking of a text file these are proper full word processor
+file formats the docx file is a reasonable um word processor file format
+the doc file is a pretty insane um word processor file format but neither of them are really what i
+would recall a text file format things that just contain text
+so if word processor files are not really text files as such then can we persuade word to
+actually do a better job of creating a text file well it turns out we can all we have to do is ask it
+if we do save as and we specify that it's a plain text file without any adornments
+what are we going to get well what we're going to get is actually
+quite a lot of options word says it can save it as a mac text encoding or
+a ms-dos word encoding or actually lots of other things too
+so let's start off with saving it as a mac text encoding and see what that gives us
+okay so let's look at that in an actual text editor
+and there we go we have hello world just the text nothing else and down the
+bottom it says that it's a mac file i wonder how it knows
+so what happens if we decide to change it as a so as a dos file instead
+so we can still save it as a plain text file we can replace it and say it's now a
+microsoft file instead so what's the difference
+by emac open it in emacs we still see exactly the same text hello world but now down the bottom it
+says it's a dos file so even though these two text files look the same in an actual text editor
+they're not quite the same and so the question is how do they differ well let's actually just look at what's
+stored in the file utility od for doctor dump minus a says
+display the actual ascii characters in each position in the file and what we can see is that we have
+hello space and carriage return a new line and then world and then at the end a
+carriage return and a new line character and so even though we've got a a
+ascii text file here with nothing fancy no internationalization or anything like
+that when we saved it as a dos file we got carriage return and new line for each of those new lines
+but if we save it instead as a mac file
+what do we get we get a different line ending by default carriage return only
+on on macos and we can see now that the new line
+characters which previously for for windows type machines were character new line for macs and lots of
+other unix type systems would just use carriage return in there instead so even how you do line endings in a
+basic text file actually depends on conventions of the different computers you might actually
+be working on and so we have two different formats just for how we do new line endings in files so you really
+have to know what the encoding is for your file in order to be able to actually understand what the contents are
+so what we've looked at so far the the words hello world are a very anglo-centric example
+they they use characters which are represented in a code called ascii the american
+standard code for information interchange and until the 1990s this was pretty much
+the way most computers actually represented data and if you came from some different background you were a bit stuck
+do we have other ways of doing this well first of all let's have a look at what ascii is and then
+we'll see how you might extend that to cope with other languages so
+ascii is basically a standard for how you map individual characters to the numbers
+that you store in bytes in your computer to represent those and so ascii dates from the 1960s
+and there are codes to store all of the usual characters in the english
+alphabet all the way through from a to z and there are codes to store numbers and there are codes to store things like
+quotation marks or exclamation marks but this is really an american view of
+the world so although there's a dollar symbol in here there's no symbols in here for pounds
+there's no symbols in here for euros and there's certainly no symbols in here for emoji
+so how might we go away representing things that are beyond basic ascii well
+what we have here is a table of 127 different values and so we need only
+seven bits to store 127 values and so we've got an extra bit there so
+maybe in each byte we could use the upper half of the range from number 128 up to 255 to store some other
+values so that's actually what a different bunch of different standards did for how
+to actually extend internationalization beyond just the english language characters
+so there are a set of standards to extend ascii out to other areas of the world this set
+of standards or one of the sets of standards is iso 8859 and the what this does is it uses all of
+those upper characters in the in the each byte the numbers from 128 up to 255 in order
+to be able to store other things now the problem is there's a lot of languages in the world and a lot of
+characters you might want to store and so there isn't really enough space in the
+upper half of your bite only another 127 characters so what they did was to define a whole
+bunch of variants iso 8a59 part 1 does western european languages and so if you
+look in the the tables for this we can see that the lower half of the encodings are just
+exactly what you'd expect from ascii characters on the upper half of the encodings in a
+an 8059 part one are good for western european languages so if you're french or
+danish or german you can find all of the accented characters you need in here
+but if you're not western european then you're a bit out of luck there so there are different variants of it for different languages so part 7 for
+example covers encodings for greek and so now the upper half of the encodings for each
+byte would encode greek characters and so forth so this lets you encode quite a lot of
+additional languages just within one byte per character
+but that's still not really enough for encoding languages like chinese and
+japanese where you have an awful lot more characters you need to be able to encode
+so at some point you're going to have to give up on the idea of storing
+a single character in a single bite of memory and use something a bit richer
+so the solution to this problem is unicode what unicode is is a great big
+table of every character from pretty much every language that you might ever come across
+it's 159 different scripts that are represented ranging all the way from english to thai
+to chinese japanese and so forth and for every possible character you might
+represent from any of those scripts there's a mapping from that character to a specific
+number which is used to represent that character in the computer so for example here the um
+the symbol pi is represented by this particular number and this in hexadecimal is 3 c 0 and that particular number
+will represent pi no matter where you come across it wherever unicode is used
+so we've got all these different characters all these different characters from all these different languages but
+of course they didn't stop there they they went on and included emoji as well and so that unicode is also has a
+mapping for every emoji you might want and as a whole standardization consortium that is devoted to registering
+um new emoji and and how they are represented and things like that but if you want to store for example to
+represent in your computer say a smiley face like this one then the numeric representation that's
+used to store that number is going to be in hexadecimal one f 600
+and that will then be used to represent that smiley face wherever you come across it
+if there's a number for every character can we use those characters in our python code well it turns out yes
+you can python 3 is unicode aware and all strings are
+unicode so we can actually just enter unicode characters directly into our python programs
+now of course we still have to have a way of getting those characters into the program here and emacs doesn't
+have a fancy way of doing that but i can actually just do insert character
+and i can type in the hexadecimal code for the particular character i want to insert
+so if i want to have say a hand doing a vulcan live long or prosperous salute
+there's a unicode character for that and we can run that and so what i have here have to define
+straw one to be hello live long and prosper and i can print that out and i can print out the length
+of the string we can see what that does
+and it does what we'd expect it actually just prints out absolutely fine and the length of that string is six
+characters now we're not quite done there because
+actually unicode's slightly more complex than that let me show you another example
+because whilst there is a a charac code for every character you want to be
+able to represent there's also modifier characters as well so i can insert
+another unicode character in this case let's do uh 1f 3 f
+b because my hand isn't yellow my hand is sort of pasty white and then get a pasty white hand
+or if you're want to represent a different skin color there's there are
+unicode modifiers for all the different skin colors or at least a reasonable range of them on f3 f e
+is a slightly darker skin color and so forth and so you can personalize your emoji to to match
+what's appropriate for what you're trying to represent now the question
+we have remaining here is okay so if python thinks that is six characters what do you think that is well
+let's try and run it and here is where it starts to get a little bit more complicated that is six
+characters i think we'd agree that's probably six characters but that's seven characters and the reason for that is that there's
+still actually the vulcan hand symbol and the unicode modifier character in
+there and even though you can't see them they're actually there and so this is where you have to be really quite
+careful to understand what's going on in terms of the way the strings and things are encoded if you want to understand
+how much screen space is it going to take to take this well it's not obvious is it it's not easy to
+know exactly how that's going to be represented that's where things get a little bit complicated
+so how are these characters actually represented in this python file or in
+other text files for that matter well originally unicode was designed with the
+idea that each character would occupy two bytes of the file but they pretty rapidly ran out of space
+because in two bytes you can only store two to the sixteen values or six
+five five three five and we currently have a hundred and forty four thousand possible characters so you're obviously
+going to need more than that and so the canonical representation for unicode
+typically is destroyed in a in a 32-bit integer for each of these values
+which would be fine except for it's not very efficient and so the question then is well how do we
+store them more efficiently but there's also another problem which is an awful lot of stuff
+actually still uses ascii as it's sort of a baseline so for example our python program here
+i was just editing a python program and i stuck some unicode in it but my python program when i was editing
+it was ascii text with one byte per character and i've just gone and stuff some unicode characters into there
+so what happened did the whole file suddenly expand to four bytes per character
+well no that's not what happened so let me just trim this out so we've just got the hello
+and the other characters in there and we'll look at that in in od oops one too many okay
+so now we've just got the hello and then the two hands okay so what does that look like when we
+actually look at the uh what's what's stored in each of the bytes of the file
+we can see that hello is stored with one character per byte just in standard ascii there's nothing
+unusual going on there but then when we get to the the vulcan hand symbol we're no longer an ascii and what we
+have here is is four bytes that are used to store that vulcan hand symbol we've got a new line we've got the next
+hello and then we've got the same four bytes storing the second vulcan hand symbol and then another four bytes
+which are storing the skin color modifier for that vulcan hand symbol and so what we have here is something
+that's quite interesting we have some characters are represented by a single byte and some characters are
+represented by four bytes so obviously what we're going on here is we've got some kind of fantasy
+variable length encoding that it defaults to ascii but it can escape out to do other
+characters that are not in the ascii data set when it needs to do so
+so uh all non-ascii characters represented as four bytes
+well seems like that might not be all that efficient so maybe we should try it out and see
+whether other things are also four bytes so we'll get rid of that vargan hand symbol let's replace it with
+something a little easier to get on a english keyboard a pound sign so how's that represented
+so we've got the original hello and welcome hand symbol and then we've got hello and we can see
+that that pound sign is represented here as two bytes we can't see from this
+particular representation what those bytes are but there are two bytes there so we've got single byte per character
+representations we've got four byte per character representations we've got two bytes per character
+representations for things that are maybe a little bit more common than a vulcan ham symbol
+so that's actually quite an interesting variable length encoding
+but how is it done [Music]
+so this variable length encoding of unicode is known as unicode transformation encoding
+8 or utf-8 and it's 8 because it's encoded into
+units of 8 bits or 1 byte now to understand what's actually going
+on with this we should probably look at how various different characters are encoded so if we look at the letter a
+the the unicode encoding for letter a is in decimal it's 65 but
+the way these are always expressed it's not actually in decimal it's usually expressed in a hexadecimal encoding
+and so if you look it up in the utf tables this will end up as u plus zero zero
+four one and this four one is it is basically 65 decimal but in a hexadecimal encoding now
+let's look at some other characters as well so the the usual british pound sign
+um in unicode is u plus zero zero a three
+that one will actually encode relatively concisely um we've got the euro symbol which came
+along a little bit later and that is u plus 2 0 ac and we've got a smiley face
+which we don't really care very much about it's compact encoding and so that's going to be u plus 1 f 6 0 0.
+okay so those are some unicode values these are the the the actual
+numbers that represent these particular characters in unicode but how do we put these numbers into a
+file in this variable length encoding that's the question we're trying to answer here now before we do that i should probably
+explain a little bit about the relationship between decimal hexadecimal and and binary
+and why computer scientists use hexadecimal all the time for doing this stuff when base 16 isn't
+necessarily the most natural thing to think about in in for humans we have 10 digits most of
+us and so we normally think about things in base 10 but it turns out that when dealing with things in computers
+especially if you have to translate to and from binary it's actually much more convenient to represent things in
+hexadecimal and so to do that let's just look at what the numbers
+in are in binary and how they translate to hexadecimal so zero zero zero zero would be the
+number zero number one would be zero zero zero one two is zero zero one zero and so forth
+[Music] okay so those are the first 16 numbers
+represented in binary down this column and in hexadecimal in this column and so
+what you can see is that all the possible things we can fit into four bits go from 0 up to 15
+and so there's a direct one-to-one correlation between four bits in binary format and a single
+digit in hexadecimal format and this means that it's very easy to translate between hexadecimal
+and binary we can simply if we want to go over the binary for six in hexadecimal it's the same as
+a 6 in decimal no problem it's 1 1 0. like zero ones one two one four and
+zero eight but if we want to look at things that are more than nine then it becomes much more natural
+to look at them in hexadecimal encoding because 10 would be two digits um but
+there's no direct mapping in terms of the number of digits in decimal and the number of digits in binary
+whereas there's a direct mapping of four to one between the number of digits in binary and the number of
+digits in hexadecimal so what this means is we can look at these codes
+in hexadecimal and immediately figure out what they look like in binary and that turns out to be very useful for
+us so if we look at for example um the a character
+and we just work from from right to left 1 in hexadecimal is going to be 0
+0 0 1 and 4 in hexadecimal is 0 1 0 0 and
+this therefore is a in binary that would be the 4 and that would be
+the one in hexadecimal but there's no direct translation to 65 in decimal so so this is much less
+useful for us when we're trying to think about converting between binary and something that we can actually usefully read because humans are not
+very good at reading binary similarly our euro character there
+we've got a c which is here one one zero zero
+let's see an a is one zero one zero
+zero is zero zero zero zero and the two
+up here zero zero one zero and so we can do is do this very easy translation so now we
+know what these things are in in binary we now have to come down to how do we actually encode these things
+in utf-8 in a variable length encoding okay i've shuffled all of those to one side to
+pick a bit more space now utf-8 says that
+anything that would be representable in 7-bit ascii just as encoded directly into into utf-8
+so that's basically anything with 7 bits has a 0 in the first bit of its utf-8
+encoding and then the other 7 bits just translate through directly
+or just three five six seven okay and then so that's a a single byte encoding
+but if you can't fit it into seven bits then we move on to two byte encodings
+and in a two byte encoding in the first byte the first bit is always one to
+distinguish it from the from the single byte encodings and then the next two bits are one zero
+and the reason why they're one zero become apparent in a moment but it's basically to distinguish it between the three and the four byte encodings
+and then we get five bits that we can fit into there and then we have to go into the second
+byte and so the we use a one zero as a
+in the upper two bits to signal this is a continuation of the previous byte and then we can use six bits to
+encode the data that we want to encode one two three four five six
+okay so how does this represent with with our particular characters here well our a which was 41 in hex
+can go into a single byte encoding so that would be a zero in the first bit
+and then the remaining digits the remaining seven bits the one is zero zero zero one
+and the four in hex is zero one zero zero but we don't have the
+first zero so that's just one zero zero and so that would be just the
+the direct encoding of the the letter a
+now our pound sign
+is 0 0 a3 okay so now this doesn't quite fit into seven
+bits this zero zero a3 the three is zero zero one one and the a is
+one zero one zero so we've got eight bits we need to stuff in here it doesn't fit into seven bits
+and so what we do is we switch to the two byte encoding so in the first byte we're going to have
+a one one zero and then five bits and in the second byte we're going to have
+one zero and then up to six bits and so we can take these eight bits
+we take the lowest six of them and put them in here one one zero zero
+one zero so that's used up those ones and then we can take the next two bits
+and put them in here one zero and then we we fill in with zeros here and so the pound encodes these two
+bytes like this and that gives the two byte encoding
+if we want to go to something slightly more complicated which is the euro well that's going to be a three byte
+encoding
+and so to distinguish it from the two byting codings it uses one one one zero and then that only leaves us
+with four bits left over there and then the continuation bytes are the same except we have two of them
+and so to encode our euro our euro was two zero ac
+so working from right to left c is one one zero zero a is one
+zero one zero zero is just zeros and two
+is zero zero one zero okay so that's going to be our euro
+symbol and now we have to figure out how we stuff these bits into the bytes
+this is not going to fit into the the number of bits we have left over for a two bit encoding
+uh one two three four five six seven eight nine ten eleven twelve thirteen fourteen to the
+most significant one and we can only get six plus five is eleven so it doesn't fit into a two byte
+encoding so we're gonna have to go to three bytes so that means that we know that these
+are going to be one one one and then we've got one one zero and we've got four bits left over
+and then we've got one zero and then we've got six bits left over six and then we've got another one zero
+and we've got another six bits that we can fit there and so we basically just have to copy these bits in
+starting at the right hand side so the first lower bits zero zero one
+one zero one that's that chunk then we start to copy in here zero one
+zero zero zero zero so that's that chunk these ones zero zero one zero will fit
+in there and that's the binary encoding for our euro symbol fitting into three bytes
+and so you can see that the basically we just extend that same pattern if we go out to four bytes
+one one one one zero so we only get three left here and then one zero and then we get
+and we've got three of these so
+i can't quite fit the one over there so this is how we can actually create variable length encodings and the nice
+thing about this is that if you look at any of the bytes of the file you can you just have
+to jump into the middle of the file and look at a byte are we at the beginning of a character
+and if we get anything that starts in 0 or 1 1 0 or one one one zero or one one one one
+zero um then we know that this byte is the start of a character
+and if we look in and we find anything that starts with a one zero we know that we're somewhere in the middle of a character and we need to
+move back through the file to find the start of that character and so this means that we have variable
+length encodings the most common ones tend to be encoded with short codes
+the uncommon ones like our smiley tend to be encoded with long codes and wherever we jump into the file
+we can figure out whether we're at the start of a character and move on to the next character or move back to the previous character pretty easily
+this is quite an elegant way to try and stuff basically codes which are sometimes
+quite rare but quite we're going to use large values for once and that's quite common especially the things that are
+ascii because we've got so much legacy of bit ascii codes um on computers they end
+up all encoding down to a single byte and as a result we can have this sort of how our k can eat it in the sense that
+we can have these efficient codes for things that occur a lot and we can have slightly less efficient
+codes for things that occur less often and that's a pretty good compromise and this is why utf-8 has ended up being the
+the universal way for the internet and for languages like python to be able to encode text that can
+incorporate any character set in the world including emojis
+[Music] so we've seen how you can store text
+even text that includes emoji as a series of numbers stored in bytes in computer memory or on storage but
+how do you store numbers i mean that seems like a bit of a silly question given that we've just been looking at it
+but really we've only seen how you store the numbers from 0 to 255
+in binary in individual bytes of computer memory but how do you store numbers that don't
+fit in that range such as 257 or 3 billion or
+minus 1 or even 0.25 how do you store those sort of numbers
+in a computer so let's look at that next let's start with positive integers because they're the
+easiest things to think about is a little program that just prints out
+numbers so it starts with number three and multiplies by three each time getting bigger and bigger and bigger
+it just prints out what the decimal number is and what the binary equivalent is and so you can see that as the
+numbers are up between 0 and 255 we can get away with storing those numbers in one byte of memory
+if the number is between 256 and 65335 then
+we can get away with storing that in two bytes of memory and similarly as we go up we need more
+and more bytes of memory and so when it comes to storing our integers we really just need to know what the
+largest number we need to store is and then we can figure out whether we want to use a one byte representation eight bits or
+a 16-bit representation or a 32-bit representation or a 64-bit representation
+and now python hides all this from you but if you actually need to know how are
+you manipulating in terms of the instructions the cpu operates it needs to know what size of data it's operating on to
+be able to do the right thing with it python hiding that from you is very nice
+from a programmer's point of view in python you don't care how big an integer is you can just use
+any institute you want numbers no matter how big they get python will be able to cope with that
+but if you come to store your data from your python program in a file now you're going to have to
+actually pay attention to how large the numbers are because you're going to have to know how
+many bytes in file to reserve for that particular binary data so you need to know whether you need
+whether two bytes is going to be enough or four bytes or eight bytes and so forth um you can't just get away with thinking
+oh it's an arbitrary integer you can just stuff it into the file because when you read back from the file
+you need to have know how many bytes were used what the representation was so this is one of the things you need to
+be careful of when you're actually dealing with python when you represent them in the computer
+just in variables we don't need to care very much but as soon as you start to deal with the outside world
+whether it's a file whether it's transferring data over the network and so forth you need to very much care about the representation
+and the first thing you need to care about is how many bytes are we using to represent our integers
+now let's take a look at this particular number 252 million 117
+to 761. now why have i picked that number i picked it because it makes a nice
+pattern there's one one bit set in the least significant byte
+there are two one bit set in the next byte there are three one bit set in the third byte
+and there are four one bit set in the fourth byte now when we store this in computer
+memory what order are the bytes stored
+so just how do you lay out this number in memory well it turns out that as with many
+things the computer scientists fell into two camps in terms of how they thought
+about the problem now in the first camp there are people who say well okay let's just visualize how
+memory is laid out and so if we divide this into bytes of memory
+where this is sort of the first byte in memory this is the second byte and third and fourth and so forth
+how would you put this number in it well it's pretty obvious how you put this number in there you just copy it straight in so that one
+would be one zero zero whatever this one would be one one zero zero whatever this will be one one one
+zero zero and this will be one one one one zero zero zero and so that's the obvious way to put this number into
+memory the largest byte the light goes at the first in memory and then
+they go towards the least significant byte and that's the obvious way to lay things out in memory because you just want to copy these bits
+straight into memory like that and so that's the camp that that are now known as the big endians
+and they learned the big engines because the big end of the number goes first in memory now
+that's one way of thinking about the problem but unfortunately it's not the only way of
+thinking about the problem because there's also a different camp who thinks that no you don't write
+memory out like this you just think about memory as being a whole series of bytes that we can draw going down the
+board and so this is the first byte in memory and this is the second and this is the
+third and this is the fourth and so forth and now the obvious thing to do is to well we don't
+sometimes we're going to need one byte of memory sometimes we're going to need two bytes in memory sometimes we're going to need four bytes in memory
+so we'll just take this and we'll put it into the first of these bytes and then we'll kind of overflow from
+that around to the second one if we need the space and then we'll put that one into here and then we'll overflow from that one
+round to here if we need the space and then we'll go that and then we'll overflow from there and so
+what we end up with is the number basically starting wherever it starts and carrying on through depending on how
+many bytes of memory it actually needs and so that means that
+the first thing in memory is this end of the integer and the second one in memory is this
+byte of the integer and the third one in memory is this byte of the inter and the fourth row memory is this byte of the integer
+and so in this case the little end goes first and so these are known as little endians
+now none of this matters so long as your data stores it stays in the memory
+of the computer but as soon as you actually want to transfer information between
+computers now you need to know when you're sending an integer across
+the network is the first byte of the integer the big end or is the first byte of the integer
+the little end and if you don't know what you're how you're sending it
+then a computer that stores it in this way won't be able to talk to a computer that stores it in this way
+and this of course became a big issue in the 1970s going into the 1980s when the
+internet suddenly started to come along before that it didn't really matter and so there were religious wars fought
+over this issue and in the end the big endians won
+and the network byte order is defined as big endian the big end of your numbers goes first
+and that sort of made sense at the time because the dominant computers things like pdp-11s
+and so forth were big endian computers now things would probably have ended
+there except for the fact that this company called intel made some processes that turned out to be
+reasonably successful and so the intel x86 processors unfortunately
+they were little endian and so pretty much every computer these days is
+an intel x86 processor unless it's arm like on your phone
+and so the computers that dominate the internet now unfortunately have a different byte
+order to the computers that dominated the internet in its early days and so whenever you want to take an
+integer that's stored on your computer and transfer it across the internet you have to shuffle the
+bytes around to get it into network byte or to transfer it across the network to shuffle the bytes back again at the other end
+it turns out that arm which make the processors or design the processors that are in your phone and so forth um they actually designed
+their process so they could either be big engine or little engine there's ways to actually set the processor up so they
+could do either way around but pretty much all arm processors that are that are used in your phones these
+days are configured so that they work in little endian order so we've ended up with this strange
+situation where network byte order is defined as something that's different from the byte order of pretty much every
+computer that's used on the internet today and that's not necessarily the best situation we could have been in
+so far we've seen that if you want to store integers we're going to have to pay
+attention to two things the first thing we're going to have to pay attention to is
+how many bytes do we need do we need to use one two four or eight bytes typically to
+be a power of two um depending on what range of numbers we want to be able to hold
+the second thing we've seen is that if you want to store integers that require more than one byte
+we have to pay attention to the byte order i'll be using a big endian representation or we're using a little
+engine representation but there's one more thing we need to pay attention to so far we've only looked at what happens
+with positive integers what are we going to do about negative integers
+suppose we're trying to store for example the number -13 the positive number 13
+is if we use just say an 8-bit representation is 0 0 0 0 1 1 0 1.
+it's 12 plus 4 plus 1. but how do we represent -13 well it turns out that over the
+years computers have used three main different representations for negative numbers
+the the first way they've done is something called sign and magnitude which is they simply
+steal the most significant bit and if the most significant bit is a zero
+then the number is a positive number and if the most significant bit is a one then the number is a negative
+number and that's it and this has the main advantage of just being very very simple we can easily see what's going on
+it does have some slight problems though when it comes to actually how we do arithmetic we have to treat negative numbers
+somewhat differently from positive numbers so it requires extra hardware the
+second way that computers have used to represent negative numbers is known as one's complement and so if we want to convert from say 13
+to -13 all we need to do here is simply to flip every single one to be a zero and every
+single zero to be a one and so the -13 is just the complement of 13.
+now this works reasonably well but there are some some minor wrinkles um one particular thing to note is that
+there are two zeros there's positive zero which is where all of the binary bits are zero
+and there's the complement of it which is where all the binary digits are ones and the fact that we've got two zeros
+means that if we're counting up or counting down there's a bit of a discontinuity around the point of zero and that makes
+math just a little bit harder for the hardware so that brings us to the third way of
+storing negative numbers which is two's complement so if we had this problem with there being
+two zeros we can solve that problem instead of by just turning every one into a zero and
+every zero into a one we do that and then we add one to the result and that's what's known as two's
+complement now this might seem slightly strange thing to do but you can immediately sort of see that if
+it sort of solves the problem of having two zeros because if we add one to a number where all of
+the digits are one that's going to carry up through the digits to get to the maximum one and turn it into a zero so we've only got
+one zero now rather than two now it has some sort of nice properties
+so the first thing to note is that if we add minus 13 to plus 13 we end up with
+2 to the power n where n is the number of bits we're using in this case we end up with 2 to the power 8.
+but this is true for any pair of numbers if you add a num positive number to its negative
+equivalent we're always going to end up with 2 to the power n now why is that an interesting thing
+well we can sort of flip this around and we can say well okay if we want to go from a positive number
+to negative equivalent we can just subtract it from 2 to the power n that has exactly
+the same thing as flipping all the bits adding 1. now this immediately then shows us that
+we've got um some interesting properties so if you want to go from the most positive
+number that you can represent so that's a zero and then every other bit is a one and we add one to that so if we go
+counting up counting up counting up we get to the most positive number we want to store and we add one to it it's going to flip from basically the
+most positive number we want to store into the most negative number we can store in this particular case it would go from
+127 to minus 128. but something slightly more interesting
+than that which is that what happens around the zero point when we're counting up so
+let's have a look at how we still say minus 3 minus 3 is represented in this way okay
+so what happens if we want to count up by 1. so we want to add 1 to that do we have to do
+anything special to do arithmetic with negative numbers well it turns out no we don't
+if you just do exactly the same arithmetic you did for positive numbers the normal way we add binary digits we
+go from minus three to minus two like that okay so we can add another one and we go
+from minus two to all of the binary digits being one and that's minus one
+and what happens if we want to add one again well if we add one to this it's going to
+carry all the way up into the ninth bit but we don't have nine bits so that would get thrown away
+so if we add one to all of the ones it's going to go to all the zeros which is our representation of zero so it's just
+magically done the right thing and we can keep counting up and so forth with positive numbers but we know that works
+so the really cool thing about this two's complement representation is that all of the basic operations
+addition subtraction multiplication and so forth are exactly the same
+for negative numbers as they are with positive numbers in fact the computer hardware doesn't even have to care that it's a
+negative number it doesn't even have to know it's a negative number just addition subtraction multiplication just do the right thing
+so it the actual computer cpu has no idea whether it's adding negative
+numbers or positive numbers all that down to is how it's interpreted
+by higher level software is it interpreted as being a negative number if it's sufficiently large or is it interpreted
+as being a positive number but the hardware doesn't have to care so this is a very nice property and
+this means that pretty much all modern computer hardware uses this representation which is two's
+complement representation to store negative numbers and so it's very cute in terms of how the
+hardware simply doesn't have to know that it's actually negative or positive the right arithmetic happens
+irrespective of whether it's positive or negative
+now if we've got some integers in our python code and we want to actually write them out to a binary file or write
+imagine a binary format to a network connection then we're going to have to actually
+tell python how to convert those integers what representation to use
+and so suppose we've got this integer here 1027 and we want to convert it
+into a binary representation in order to restore it to a file
+we have to use this two bytes function to convert from an integer into a set of bytes suitable for writing out
+into the file and we have to tell it how to do it so the first thing we have to do is return
+how many bytes to use in this case 1027 will fit into two bytes so that's just fine and we also have to
+tell it the byte order which way round we're going to put the bytes in this case we're saying we need to be big endian and by default it will default to saying
+this is an unsigned integer but if we want to assigned integer we're going to have to tell python that too
+if we wanted to do it as four bytes we could specify four bytes if we wanted to do it as being little endian instead of big
+endian we can do that too we've got a number that doesn't fit into four bytes or even into eight bytes
+so here we've got 2 to the power of 65 that won't even fit into 8 bytes
+so we can tell python can you do this as an industry but use 10 bytes please
+and it can do that too and if we want to store say 1027 here we can do two bytes we can
+say maybe we want to store it as four bytes but this is going to be a signed number
+now and so use your two's complement signed wrist scientific to do that
+so all of these are basically all the different ways we can figure out how to actually represent
+integers specifying the number of bytes the byte order and whether it's signed or unsigned the three things we need to
+actually tell python how to do now of course it's possible you can do this with a value that can't be
+represented so if we try to say store 65536
+which is just too big to fit into 16 bits in two bytes it's going to cause an error
+and so python will actually throw a overflow exception in this particular
+case and hopefully we'll get an error there and similarly if we want to store three
+two seven six eight which is one too large to store
+as a signed 16 potential you can store it as an unsigned one but we can't try it as a signed integer
+that will also cause an overflow error so these are basically the conversion functions you need if you want to
+actually run um tell python to store your integers in a file or you want to talk python to put
+them in a binary representation to transmit across a network connection so let's run this
+so what we can see here is that um if we store 1027 as two bytes big endian
+this is saying this is a stream of bytes this is just how python represents byte
+strings when you ask it to print it and the first one of those bytes we've got hex four and the second one of those
+bytes we've got hex three and that's because 1027
+is basically number four in the the largest bits it's the
+first bit of the upper bike would be 256 the second one is 512 in the third one 1024
+1024 is that in the upper byte and 1024 plus three gives us a thousand
+twenty seven so that's actually the correct representation of that big engine the thousand twenty four part comes
+first because it's big endian and the three comes second we want to store it as four bytes then
+first upper two are going to end up zero because we didn't really need them but if we want to store it as four bytes little endian then everything flips
+around the three comes first then the thousand and twenty four and then
+the additional more significant zeros we don't really care about those and and so forth so if we then look at
+the negative values here 1027 is four bytes negative
+signed then we can see that most of the bits end up as as one because a thousand and twenty four is actually
+um because the 27 is a fairly small number compared to how we restore things in in
+four bytes so all the upper bytes end up with one one one one one because we've wrapped around and we're
+pretty close to getting back towards zero now and then if we try to store six five
+five three six in two bytes well it does correctly cause that overflow exception and similarly if we
+want to store three two seven six eight in two signed bytes that also causes
+our um overflow exception so so that's how we tell python to
+convert from integers to a set of bytes suitable for storing to a file or transmitting across a
+network [Music]
+so we're almost done but not quite there's one more thing we need to know how to do
+what happens if we want to store numbers which aren't integers we want to store 0.25
+or 0.3 or numbers like that how do we store that kind of number
+well it turns out that computer hardware pretty much all implements a standard called ieee
+floating point arithmetic and so we should understand a little bit about how that works too
+so the first thing to note is that we can use a point in the same way we use decimal point in decimal
+in binary as well so if we want to represent the number 2.25 which is in decimal we want to
+represent in binary well the number 2 in binary is 1 0 and 0.25 well
+we have next column after the point would be a halves column we don't have any of
+those and then the next column after that would be the quarters column and we have one of those
+so 2.25 in decimal is 1 0.01 in binary using a binary point
+okay so we could use a binary fixed point notation in this but then we
+have to figure out how many bits we have to the right of the binary point and how many bits we have to the left of the
+binary point and that is pretty limiting when we actually want to to represent numbers we don't
+necessarily know in advance or want to have to specify in advance exactly how many bits there are in each
+half of our number so what's the alternative well
+when we do this in decimal we use scientific notation so you can say if we have 1 2 3 4.5
+we can put this in binary in scientific notation as 1.2345
+times 10 to the power of 3. and so we can use precisely this way of
+representing numbers to represent our binary numbers too so if we've got one 0.01
+in binary then we can represent that in canonical form as 1.001 times
+2 to the power in this case 1. so this is what we can do we can take
+our numbers and we can represent them in this binary version of scientific explanation x
+scientific notation where we have a number here which always has a one
+before the binary point and then some number of places after it um times two to the
+power of some exponent so now all we need to do is figure out how many bits we need for this piece
+and how many bits we need for the exponent so this brings us to ieee 754 floating
+point representation and so this is a standard for how to represent floating point numbers in computers
+and ieee 754 specifies this for 32-bit floating point numbers there's also a
+version for 64-bit floating point numbers which pretty much works the same just with bigger fields
+so how are we going to put our 1.001 times 2 to the power 1
+into these bits well the first thing we need to do is figure out how many bits we're going to have
+for the mantissa and how many bits we're going to have for the exponent and we're also going to have to figure
+out how we're going to represent negative mantissas and negative exponents because we're going to have to
+be able to cope with those two if we want the number to be very small we need negative exponents and if we want to have the full range of
+numbers we want to be able to represent we need to be able to have negative mantissa so what i triple e floating point does
+is first of all it it carves out the very top bit here and says that's a sign bit
+if that bit is zero then it's a positive number and if that bit is one then it's a
+negative number the next thing they do is they carve out the next eight bits
+so we've got eight bits here and this is the exponent
+which leaves the remaining 23 bits to be the mantissa
+but how exactly are we going to encode the mantissa and the exponent into these legs well let's first of all deal with the
+mantissa because it's slightly simpler the first thing we realize is that actually for
+any number we want to store there's always going to be a one to the left of the point here and so we
+don't actually need to store that we can just have that implied the only exception for z
+is zero and then we can have special case for zero and by doing this we can save ourselves a bit
+so when we store the mantissa here in these 32 bits we assume that the one is there
+and then we just write the remaining bits so that zero zero one would end up here and the rest of
+the bits will all end up as zeros because we don't actually need any more precision than that so that's the
+first part that's how we store the mantissa now the next question is how do we extort how do we store
+the exponent now the problem here of course is that we need to be able to store very big numbers with large
+positive exponent and we had to store very small numbers with negative exponents and so we're going to
+have to figure out how we actually store that in here now we could go for some kind of two's complement notation but that's actually
+a little more complicated than we really need for this particular case so what all ieee did is to say that
+we're just going to add in hex 7f or 127
+in decimal to the value of the exponent before we store it in here and that's just shifting the values so
+that we can get a range of values so if we want to store the exponent of 1 in here
+we add it to 127 we get 128 and 128 in binary is one and then
+seven zeros and that's exactly how we store 2.25
+in an ieee floating point number using 32 bits now we know how
+floating point numbers are stored let's have a look at them in python now what we've looked at on the
+whiteboard was floating point numbers that are 32-bit if you'd use the float type in c you'll
+get a 32-bit floating point number if you use the double type in c you'll get a 64-bit floating point number
+and it's actually the 64-bit version of the floating point that python uses for for its floating point numbers but we
+can actually have a look and and ask python what exactly are you using how big are the different fields and you
+can do this by if you just import this and then print out sys.float info it will tell you everything you want to
+know about how floating point numbers are actually represented on your particular computer which might differ if you from other computers if
+you've got a different cpu and so we can run this we can run
+code and see what it gives us
+there we go and so what this is telling us is that the the range of exponents that you can
+store for example it can say that the largest exponent it can store is 1024 so 2 to the power of 1024 is
+sort of roughly the largest things it can do the minimum exponent it can store is uh minus 1021.
+um it tells us that the the mantissa in this particular representation uses
+53 bits so that gives you some idea of the precision and actually if you really want to know what the best possible precision is
+epsilon here is the smallest possible difference that you can represent in floating point
+numbers in this particular implementation of floating point so that gives you an idea of what the
+maximum precision is and maximum range you can represent it so it would seem then that floating
+point numbers are this really useful convenient way of representing
+any numbers you want to represent and because you can represent fractional numbers they're probably
+better than integers but you've got to be quite careful when you use floating point
+numbers um because sometimes that limited precision is going to come back
+and bite you so what do i mean by that well let's just
+write some code so what i want to do is i'm going to do for i in range
+up to let's say 20.
+and what am i going to do i want to just print out what happens if i take i and divide it by a hundred so
+that single slash is going to give us floating point division in python 3 and i'm going to multiply that
+by 100 again so
+take i divide it by 100 multiply by 100 we really ought to be able to get back where we started shouldn't we
+and so what happens if we run that well let's have a look
+well some of the numbers came back where they were supposed to but 7 and 14 did not
+and so well what's going on here well we've only got a limited number of
+bits and so if you try to represent 7 divided by 100 in binary floating
+point numbers what we end up with is a recurring decimal but as there's a limited number
+of bits it gets truncated and then we multiply it back by 100 and we don't quite get back to where we started
+it's exactly the same thing that would happen if for example we try to divide 10 by 3 and wrote it down as a decimal
+and then took that written down number and multiplied it back up you can only write down 3.3333
+some number of times whatever number of times you do when you multiply it back up you're not going to get to exactly
+the same place as where you started from and so there's a rounding error that can happen there and that rounding error can
+definitely happen in in 13 point numbers as well now does it always round back to the
+same number um well let's have a look at that um so let's just store this result
+um and i wanted to see whether we always get back to the same integer even
+we'll go up to 100 this time and so what i want to do is i'll say if um i
+is is not equal to that result rounded back to an integer
+then we're going to print out what we got we're going to print out i we're going to print out the result
+and we're going to print out what integer it rounded to is
+okay and one square bracket there okay and so if we run this
+are we gonna get some numbers that come back to different integers even
+and the answer is yes um if i take 29 and divide it by 100 and then multiply
+it by 100 and then round it back to the nearest integer again well we just round it to an integer it's not the
+nearest integer because when you do an int conversion from a float in python it rounds down um so we divide it and we
+end up with something just a little bit less than 29 and then we convert it back to an inch and it ends up as 28.
+so if i take integer 29 divide it by 100
+multiply it by 100 and convert it back to an integer i don't end up back where i started and so this is just one example of
+you've got to be quite careful when you're doing floating point arithmetic because you will get some truncation of the precision
+especially if you have recurring binary equivalent of decimals and
+they will get truncated they will get rounded and we don't necessarily always get back to where we started
+so you just have to be aware of there's there's a bunch of gotchas associated with precision
+in in floating point numbers so if you're kind of calculating something and expecting it to end up at exactly some value and you're
+comparing it with that for equality you might not get exactly that value if you've got some rounding errors going on so this is
+the main thing to be concerned with when you do floating point arithmetic in any programming languages including
+python is that there's going to be some rounding errors happen sometimes and so you might not necessarily get
+exactly the number you might have expected from pure maths and you need to be careful
+with that and allow some leeway for potential rounding errors that might happen but other than that floating point
+numbers are extremely convenient and we use them all the time but you do need to know the gotchas
+so we've covered quite a lot in this video we've covered how you represent textual information
+we've covered the basics of simple ascii representations all the way through to
+how you represent text in in any language of the world using unicode and how to then encode that unicode into
+utf-8 encodings which is what python uses natively and what most of the internet uses natively for for internationalization
+we've also looked at how do you represent numbers and the difficulty with how you
+might say what the representation of integers is when we store them to files or transfer
+them over the network we've also looked at floating point numbers how they're represented how they're stored and a few of the
+gotchas associated with how you actually might use them in the real world so that's it for this video see you next

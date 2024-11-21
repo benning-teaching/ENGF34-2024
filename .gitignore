@@ -180,3 +180,6 @@ _minted-03_Basics_Slides
 
 # Other
 .DS_Store
+/video12-data-formats/src/float_operations.ipynb
+/video12-data-formats/src/float_operations.py
+/video12-data-formats/numerical_erros.pdf

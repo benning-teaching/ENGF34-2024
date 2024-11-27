@@ -1,0 +1,7 @@
+import sys
+
+# data = sys.stdin.read()
+# print("Data from stdin:", data)
+
+for line in sys.stdin:
+    print("Read line:", line.strip())

@@ -1,7 +1,87 @@
-import sys
+import sys # Import the sys module to access stdin and command-line arguments
 
-# data = sys.stdin.read()
-# print("Data from stdin:", data)
 
-for line in sys.stdin:
-    print("Read line:", line.strip())
+def read_all():
+    """
+    Reads all data from standard input (stdin) at once and prints it.
+    This function blocks until all input is received.
+    """
+    # Read all data from stdin until EOF (End of File) is encountered
+    data = sys.stdin.read()
+    # Print the received data with a descriptive message
+    print("Data from stdin:", data)
+
+
+def iterate_lines():
+    """
+    Iterates over each line from standard input (stdin) using a for-loop
+    and prints each line after stripping leading and trailing whitespace.
+    This method is memory-efficient for large inputs as it processes one line at a time.
+    """
+    # Iterate over each line provided to stdin
+    for line in sys.stdin:
+        # Remove leading and trailing whitespace, including the newline character
+        stripped_line = line.strip()
+        # Print the processed line with a descriptive message
+        print("Read line:", stripped_line)
+
+
+def read_loop():
+    """
+    Continuously reads lines from standard input (stdin) using a while-loop
+    with sys.stdin.readline() and prints each line as it is read.
+    The loop terminates when no more lines are available (EOF).
+    This method provides explicit control over the reading process.
+    """
+    while True:  # Start an infinite loop to continuously read input
+        # Read the next line from stdin; returns an empty string when EOF is reached
+        line = sys.stdin.readline()
+        if not line:  # Check if the line is empty, indicating EOF
+            break  # Exit the loop if no more lines are available
+        # Print the read line as-is (including any trailing whitespace)
+        print("Read line:", line)
+
+
+def print_usage():
+    """
+    Prints usage instructions for the script.
+    Guides the user on how to select different input reading methods.
+    """
+    print("Usage: python sys-example.py [option]")
+    print("Options:")
+    print("  read    - Read all data at once using sys.stdin.read()")
+    print("  iterate - Read data line by line using for line in sys.stdin")
+    print("  loop    - Read data line by line using sys.stdin.readline() in a loop")
+
+
+def main():
+    """
+    The main function parses command-line arguments to determine which
+    input reading method to execute based on user preference.
+    It ensures that exactly one option is provided and handles invalid inputs gracefully.
+    """
+    # Check if the correct number of command-line arguments is provided
+    if len(sys.argv) != 2:
+        print("Error: Incorrect number of arguments.")
+        print_usage()  # Display usage instructions
+        sys.exit(1)  # Exit the program with a non-zero status indicating an error
+
+    # Retrieve the user-specified option and convert it to lowercase for case-insensitive comparison
+    option = sys.argv[1].lower()
+
+    # Determine which input reading method to execute based on the provided option
+    if option == "read":
+        read_all()  # Execute the read_all() function to read all input at once
+    elif option == "iterate":
+        iterate_lines()  # Execute the iterate_lines() function to read input line by line using a for-loop
+    elif option == "loop":
+        read_loop()  # Execute the read_loop() function to read input line by line using a while-loop with readline()
+    else:
+        # Handle unknown options by notifying the user and displaying usage instructions
+        print(f"Error: Unknown option '{option}'.")
+        print_usage()
+        sys.exit(1)  # Exit the program with a non-zero status indicating an error
+
+
+if __name__ == "__main__":
+    main()  # Invoke the main function when the script is executed directly
